@@ -1,0 +1,413 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.5078,
+          25.0422
+        ]
+      },
+      "properties": {
+        "商圈名稱": "西門町",
+        "行政區": "萬華區",
+        "縣市": "台北市",
+        "建議半徑": 500,
+        "參考說明": "https://www.travel.taipei/file/3235/"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.5645,
+          25.034
+        ]
+      },
+      "properties": {
+        "商圈名稱": "信義計畫區",
+        "行政區": "信義區",
+        "縣市": "台北市",
+        "建議半徑": 600,
+        "參考說明": "https://www.travel.taipei/file/3235/"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.5447,
+          25.0417
+        ]
+      },
+      "properties": {
+        "商圈名稱": "東區",
+        "行政區": "大安區",
+        "縣市": "台北市",
+        "建議半徑": 500,
+        "參考說明": "https://today.line.me/tw/v2/article/wJl5zOp"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.5202,
+          25.0522
+        ]
+      },
+      "properties": {
+        "商圈名稱": "南西商圈",
+        "行政區": "中山區",
+        "縣市": "台北市",
+        "建議半徑": 400,
+        "參考說明": "https://www.travel.taipei/file/3235/"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.525,
+          25.0882
+        ]
+      },
+      "properties": {
+        "商圈名稱": "士林夜市",
+        "行政區": "士林區",
+        "縣市": "台北市",
+        "建議半徑": 400,
+        "參考說明": "https://www.travel.taipei/file/3235/"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.534,
+          25.0143
+        ]
+      },
+      "properties": {
+        "商圈名稱": "公館",
+        "行政區": "中正區",
+        "縣市": "台北市",
+        "建議半徑": 400,
+        "參考說明": "https://www.travel.taipei/file/3235/"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.5187,
+          25.0574
+        ]
+      },
+      "properties": {
+        "商圈名稱": "寧夏夜市",
+        "行政區": "大同區",
+        "縣市": "台北市",
+        "建議半徑": 300,
+        "參考說明": "寧夏夜市入口"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.5102,
+          25.0562
+        ]
+      },
+      "properties": {
+        "商圈名稱": "迪化街",
+        "行政區": "大同區",
+        "縣市": "台北市",
+        "建議半徑": 400,
+        "參考說明": "https://www.travel.taipei/file/3235/"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.5297,
+          25.0338
+        ]
+      },
+      "properties": {
+        "商圈名稱": "永康商圈",
+        "行政區": "大安區",
+        "縣市": "台北市",
+        "建議半徑": 300,
+        "參考說明": "永康街/信義路口"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.5283,
+          25.1201
+        ]
+      },
+      "properties": {
+        "商圈名稱": "天母",
+        "行政區": "士林區",
+        "縣市": "台北市",
+        "建議半徑": 600,
+        "參考說明": "天母廣場"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.5786,
+          25.0443
+        ]
+      },
+      "properties": {
+        "商圈名稱": "五分埔",
+        "行政區": "信義區",
+        "縣市": "台北市",
+        "建議半徑": 300,
+        "參考說明": "五分埔成衣商圈"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.5782,
+          25.0506
+        ]
+      },
+      "properties": {
+        "商圈名稱": "饒河夜市",
+        "行政區": "松山區",
+        "縣市": "台北市",
+        "建議半徑": 300,
+        "參考說明": "饒河街夜市入口"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.4639,
+          25.0103
+        ]
+      },
+      "properties": {
+        "商圈名稱": "板橋府中",
+        "行政區": "板橋區",
+        "縣市": "新北市",
+        "建議半徑": 500,
+        "參考說明": "https://www.economic.ntpc.gov.tw/ShoppingDistrict"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.4726,
+          25.0137
+        ]
+      },
+      "properties": {
+        "商圈名稱": "新板特區",
+        "行政區": "板橋區",
+        "縣市": "新北市",
+        "建議半徑": 600,
+        "參考說明": "板橋車站為核心"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.4923,
+          25.066
+        ]
+      },
+      "properties": {
+        "商圈名稱": "三重三和夜市",
+        "行政區": "三重區",
+        "縣市": "新北市",
+        "建議半徑": 400,
+        "參考說明": "三和夜市入口"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.4512,
+          25.0374
+        ]
+      },
+      "properties": {
+        "商圈名稱": "新莊廟街",
+        "行政區": "新莊區",
+        "縣市": "新北市",
+        "建議半徑": 400,
+        "參考說明": "新莊地藏庵/新莊路"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.3897,
+          25.0789
+        ]
+      },
+      "properties": {
+        "商圈名稱": "林口三井OUTLET",
+        "行政區": "林口區",
+        "縣市": "新北市",
+        "建議半徑": 600,
+        "參考說明": "三井OUTLET園區"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.4399,
+          25.1717
+        ]
+      },
+      "properties": {
+        "商圈名稱": "淡水老街",
+        "行政區": "淡水區",
+        "縣市": "新北市",
+        "建議半徑": 500,
+        "參考說明": "淡水捷運站/中正路"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.3535,
+          24.9549
+        ]
+      },
+      "properties": {
+        "商圈名稱": "鶯歌老街",
+        "行政區": "鶯歌區",
+        "縣市": "新北市",
+        "建議半徑": 400,
+        "參考說明": "鶯歌火車站/重慶街"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.3704,
+          24.9341
+        ]
+      },
+      "properties": {
+        "商圈名稱": "三峽老街",
+        "行政區": "三峽區",
+        "縣市": "新北市",
+        "建議半徑": 400,
+        "參考說明": "民權街/和平街"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.6161,
+          24.9909
+        ]
+      },
+      "properties": {
+        "商圈名稱": "深坑老街",
+        "行政區": "深坑區",
+        "縣市": "新北市",
+        "建議半徑": 300,
+        "參考說明": "深坑街/北深路"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.4967,
+          25.0026
+        ]
+      },
+      "properties": {
+        "商圈名稱": "中和緬甸街",
+        "行政區": "中和區",
+        "縣市": "新北市",
+        "建議半徑": 300,
+        "參考說明": "華新街"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.5159,
+          25.0115
+        ]
+      },
+      "properties": {
+        "商圈名稱": "永和韓國街",
+        "行政區": "永和區",
+        "縣市": "新北市",
+        "建議半徑": 300,
+        "參考說明": "中興街"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.8457,
+          25.1091
+        ]
+      },
+      "properties": {
+        "商圈名稱": "瑞芳九份",
+        "行政區": "瑞芳區",
+        "縣市": "新北市",
+        "建議半徑": 400,
+        "參考說明": "基山街/輕便路"
+      }
+    }
+  ]
+}
