@@ -15,6 +15,7 @@ export const useChatStore = defineStore('chat', () => {
   	];
 
 	const recommendComponents = ref(null)
+	const isChatLoading = ref(false)
 
   	// 從 sessionStorage 讀取
   	const savedChatData = JSON.parse(sessionStorage.getItem('chatData')) || [];
@@ -37,7 +38,78 @@ export const useChatStore = defineStore('chat', () => {
     	chatData.value.push({ id: chatData.value.length + 1, isDefault: false, ...newChatData });
   	};
 
+	const getSessionId = () => {
+		const d = new Date();
+		return "session_" +
+			d.getFullYear() +
+			String(d.getMonth() + 1).padStart(2, "0") +
+			String(d.getDate()).padStart(2, "0");
+	};
+
+	const requestTWCCAnswer = async (question) => {
+		const response = await http.post("/ai/chat/twcc", {
+			session: getSessionId(),
+			stream: false,
+			messages: [
+				{
+					role: "system",
+					content:
+						"你是臺北城市儀表板小幫手。請使用繁體中文回答，聚焦在臺北城市資料、儀表板使用、公共服務與資料解讀。回答要清楚、友善、精簡；若無法確認事實，請說明限制並建議使用者查看儀表板資料。",
+				},
+				{
+					role: "user",
+					content: question,
+				},
+			],
+			max_new_tokens: 700,
+			temperature: 0.2,
+			top_k: 50,
+			top_p: 0.9,
+			frequence_penalty: 1.03,
+		});
+
+		return response.data?.data?.content;
+	};
+
+	const requestRecommendComponents = async (question) => {
+		const response = await http.post(
+			"/vector/component",
+			new URLSearchParams({
+				query: question,
+				limit: 10,
+				score: 0.8,
+			}),
+			{
+				headers: {
+					"Content-Type": "application/x-www-form-urlencoded",
+				},
+			}
+		);
+
+		const components = response.data?.data?.length > 0 ? response.data.data : [];
+
+		return Array.from(
+			components.reduce((map, item) => {
+				const key = item.index
+				const exist = map.get(key)
+
+				if (!exist) {
+					map.set(key, item)
+					return map
+				}
+
+				if (item.city === 'metrotaipei') {
+					map.set(key, item)
+				}
+
+				return map
+			}, new Map()).values()
+		)
+	};
+
   	const addQueryData = async (newChatData) => {
+		if (isChatLoading.value) return;
+		isChatLoading.value = true;
 
     	chatData.value.push({ id: chatData.value.length + 1, isDefault: false, ...newChatData });
 
@@ -45,60 +117,49 @@ export const useChatStore = defineStore('chat', () => {
 		let topK = null;
 
 		try {
-			const response = await http.post(
-  				"/vector/component",
-  				new URLSearchParams({
-    				query: newChatData.content,
-    				limit: 10,
-    				score: 0.8,
-  				}),
-  				{
-    				headers: {
-      					"Content-Type": "application/x-www-form-urlencoded",
-    				},
-  				}
-			);
-			if (response.data?.data?.length > 0) {
-				recommendComponents.value = response.data.data;
+			const [aiResult, vectorResult] = await Promise.allSettled([
+				requestTWCCAnswer(newChatData.content),
+				requestRecommendComponents(newChatData.content),
+			]);
+
+			if (aiResult.status === "fulfilled" && aiResult.value) {
+				chatData.value.push({
+					id: chatData.value.length + 1,
+					role: 'bot',
+					isDefault: false,
+					content: aiResult.value,
+				});
+			} else {
+				if (aiResult.status === "rejected") {
+					console.error("TWCCChatError :", aiResult.reason);
+				}
+				chatData.value.push({
+					id: chatData.value.length + 1,
+					role: 'bot',
+					isDefault: false,
+					content: "AI 回覆服務暫時無法使用，但我仍會嘗試為您推薦相關組件。",
+				});
 			}
 
-			// 去除重複項目存到 result
-			const result = Array.from(
-  				recommendComponents.value.reduce((map, item) => {
-    				const key = item.index
-    				const exist = map.get(key)
+			if (vectorResult.status === "fulfilled") {
+				recommendComponents.value = vectorResult.value;
 
-    				// 如果還沒放過，直接放
-    				if (!exist) {
-      					map.set(key, item)
-      					return map
-    				}
+				if (recommendComponents.value && recommendComponents.value?.length > 0) {
+					topK = [...recommendComponents.value].sort((a, b) => b.score - a.score);
+					chatData.value.push({ id: chatData.value.length + 1, role: 'bot', isDefault: false, button: [{ id:1, text:'建立儀表板' }], content: `以下是根據您的問題，自動為您推薦的「組件清單」。您可以將這些組件整批加入「個人儀表板」，方便日後快速查看與使用。\n`, relations: topK });
+				} else {
+					chatData.value.push({ id: chatData.value.length + 1, role: 'bot', isDefault: false, content: `目前沒有找到相似組件，您可以換個描述再試一次。` });
+				}
+			} else {
+				console.error("VectorAnalysisError :", vectorResult.reason);
+				chatData.value.push({ id: chatData.value.length + 1, role: 'bot', isDefault: false, content: `組件推薦服務暫時無法使用，請稍後再試。` });
+			}
 
-    				// 如果已存在，但現在的是 metrotaipei，就覆蓋
-    				if (item.city === 'metrotaipei') {
-      					map.set(key, item)
-    				}
-
-    				return map
-  				}, new Map()).values()
-			)
-			// 把 result 蓋回去 recommendComponents
-			recommendComponents.value = result
-
-		} catch (error) { 
-			console.error("VectorAnalysisError :", error);
+			// 分析結束後紀錄推薦結果；AI 問答由後端 ai_chatlog 紀錄
+			saveChatLog(newChatData.content, recommendComponents.value);
+		} finally {
+			isChatLoading.value = false;
 		}
-
-		if (recommendComponents.value && recommendComponents.value?.length > 0) {
-			topK = [...recommendComponents.value].sort((a, b) => b.score - a.score);
-			chatData.value.push({ id: chatData.value.length + 1, role: 'bot', isDefault: false, button: [{ id:1, text:'建立儀表板' }], content: `您好 😊 \n 以下是根據您的問題，自動為您推薦的「組件清單」。您可以將這些組件整批加入「個人儀表板」，方便日後快速查看與使用。\n`, relations: topK });
-			chatData.value.push({ id: chatData.value.length + 1, role: 'bot', isDefault: false, content: `若您有任何新的查詢或想深入探索的內容，都可以隨時在對話框告訴我～\n 我很樂意再協助您 💬✨` });
-		} else {
-			chatData.value.push({ id: chatData.value.length + 1, role: 'bot', isDefault: false, content: `很抱歉，您提供的描述沒有相似組件，請繼續提問 ! ` });
-		}
-
-		// 分析結束後紀錄問答log
-		saveChatLog(newChatData.content, recommendComponents.value);
   	};
 
 	const saveChatLog = async(question, answer) => {
@@ -124,5 +185,5 @@ export const useChatStore = defineStore('chat', () => {
       	}
 	};
 
-	return { chatData, addChatData, addQueryData, saveChatLog }
+	return { chatData, isChatLoading, addChatData, addQueryData, saveChatLog }
 })
