@@ -46,7 +46,7 @@ export const useChatStore = defineStore('chat', () => {
 			String(d.getDate()).padStart(2, "0");
 	};
 
-	const requestTWCCAnswer = async (question) => {
+	const requestTWCCAnswer = async (question, componentContext = "") => {
 		const response = await http.post("/ai/chat/twcc", {
 			session: getSessionId(),
 			stream: false,
@@ -54,7 +54,14 @@ export const useChatStore = defineStore('chat', () => {
 				{
 					role: "system",
 					content:
-						"你是臺北城市儀表板小幫手。請使用繁體中文回答，聚焦在臺北城市資料、儀表板使用、公共服務與資料解讀。回答要清楚、友善、精簡；若無法確認事實，請說明限制並建議使用者查看儀表板資料。",
+						`你是「臺北城市儀表板」的專屬 AI 小幫手。你的任務是協助使用者理解臺北市的指標數據，並引導其使用儀表板的「組件（Components）」。
+
+請嚴格遵循以下回答準則：
+1. **僅限本站範圍**：僅回答與臺北城市資料、公共服務、及儀表板組件相關的問題。若問題超出此範圍，請禮貌地告知你只能提供儀表板相關資訊。
+2. **禁止虛構與延伸**：不可虛構本站不存在的數據、功能或政府服務。若無法從已知資訊確認事實，請說明限制並建議使用者「參考下方推薦的組件清單以獲得準確數據」。
+3. **組件導向**：本系統會自動檢索組件資料庫。請在回答中適時提及：「您可以參考下方自動推薦的組件清單，點擊『建立儀表板』來查看即時數據內容。」
+4. **精簡回覆**：回答要清楚、友善、且盡可能精簡，避免冗長的背景解釋。
+5. **語言風格**：使用繁體中文（台灣習慣用語）。${componentContext}`,
 				},
 				{
 					role: "user",
@@ -62,10 +69,10 @@ export const useChatStore = defineStore('chat', () => {
 				},
 			],
 			max_new_tokens: 700,
-			temperature: 0.2,
+			temperature: 0.1,
 			top_k: 50,
 			top_p: 0.9,
-			frequence_penalty: 1.03,
+			frequence_penalty: 1.05,
 		});
 
 		return response.data?.data?.content;
@@ -117,22 +124,37 @@ export const useChatStore = defineStore('chat', () => {
 		let topK = null;
 
 		try {
-			const [aiResult, vectorResult] = await Promise.allSettled([
-				requestTWCCAnswer(newChatData.content),
-				requestRecommendComponents(newChatData.content),
-			]);
+			// 1. 先檢索相關組件 (RAG 第一步)
+			let components = [];
+			try {
+				components = await requestRecommendComponents(newChatData.content);
+			} catch (err) {
+				console.error("VectorAnalysisError :", err);
+			}
+			recommendComponents.value = components;
 
-			if (aiResult.status === "fulfilled" && aiResult.value) {
+			// 2. 準備 Context 餵給 AI
+			const componentContext = components.length > 0 
+				? `\n\n【目前系統檢索到的相關組件列表】：\n${components.map((c, i) => `${i+1}. ${c.name} (${c.city === 'taipei' ? '臺北市' : '新北市'})`).join('\n')}`
+				: "\n\n【目前系統未在資料庫中檢索到直接相關的組件】。";
+
+			// 3. 請求 AI 回答
+			let aiContent = "";
+			try {
+				aiContent = await requestTWCCAnswer(newChatData.content, componentContext);
+			} catch (err) {
+				console.error("TWCCChatError :", err);
+			}
+
+			// 顯示 AI 回覆
+			if (aiContent) {
 				chatData.value.push({
 					id: chatData.value.length + 1,
 					role: 'bot',
 					isDefault: false,
-					content: aiResult.value,
+					content: aiContent,
 				});
 			} else {
-				if (aiResult.status === "rejected") {
-					console.error("TWCCChatError :", aiResult.reason);
-				}
 				chatData.value.push({
 					id: chatData.value.length + 1,
 					role: 'bot',
@@ -141,18 +163,12 @@ export const useChatStore = defineStore('chat', () => {
 				});
 			}
 
-			if (vectorResult.status === "fulfilled") {
-				recommendComponents.value = vectorResult.value;
-
-				if (recommendComponents.value && recommendComponents.value?.length > 0) {
-					topK = [...recommendComponents.value].sort((a, b) => b.score - a.score);
-					chatData.value.push({ id: chatData.value.length + 1, role: 'bot', isDefault: false, button: [{ id:1, text:'建立儀表板' }], content: `以下是根據您的問題，自動為您推薦的「組件清單」。您可以將這些組件整批加入「個人儀表板」，方便日後快速查看與使用。\n`, relations: topK });
-				} else {
-					chatData.value.push({ id: chatData.value.length + 1, role: 'bot', isDefault: false, content: `目前沒有找到相似組件，您可以換個描述再試一次。` });
-				}
-			} else {
-				console.error("VectorAnalysisError :", vectorResult.reason);
-				chatData.value.push({ id: chatData.value.length + 1, role: 'bot', isDefault: false, content: `組件推薦服務暫時無法使用，請稍後再試。` });
+			// 顯示推薦組件清單
+			if (recommendComponents.value && recommendComponents.value?.length > 0) {
+				topK = [...recommendComponents.value].sort((a, b) => b.score - a.score);
+				chatData.value.push({ id: chatData.value.length + 1, role: 'bot', isDefault: false, button: [{ id:1, text:'建立儀表板' }], content: `以下是根據您的問題，自動為您推薦的「組件清單」。您可以將這些組件整批加入「個人儀表板」，方便日後快速查看與使用。\n`, relations: topK });
+			} else if (components.length === 0) {
+				chatData.value.push({ id: chatData.value.length + 1, role: 'bot', isDefault: false, content: `目前沒有找到相似組件，您可以換個描述再試一次。` });
 			}
 
 			// 分析結束後紀錄推薦結果；AI 問答由後端 ai_chatlog 紀錄
